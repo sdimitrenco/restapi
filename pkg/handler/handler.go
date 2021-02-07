@@ -1,12 +1,17 @@
 package handler
 
 import (
+	"github.com/StanislavDimitrenco/restapi/pkg/service"
 	"github.com/gin-gonic/gin"
-	"github.com/sqs/goreturns/returns"
 )
 
 //Handler struct
 type Handler struct {
+	services *service.Service
+}
+
+func NewHandler(services *service.Service) *Handler {
+	return &Handler{services: services}
 }
 
 //InitRouts - initializing routs
@@ -15,27 +20,27 @@ func (h *Handler) InitRouts() *gin.Engine {
 
 	auth := router.Group("/auth")
 	{
-		auth.POST("sing-up")
-		auth.POST("sing-in")
+		auth.POST("sing-up", h.singUp)
+		auth.POST("sing-in", h.singIn)
 	}
 
 	api := router.Group("/api")
 	{
 		list := api.Group("/list")
 		{
-			list.POST("/")
-			list.GET("/")
-			list.GET("/:id")
-			list.PUT("/:id")
-			list.DELETE("/:id")
+			list.POST("/", h.createList)
+			list.GET("/", h.getAllList)
+			list.GET("/:id", h.getListByID)
+			list.PUT("/:id", h.updateList)
+			list.DELETE("/:id", h.deleteList)
 
 			items := list.Group(":id/items")
 			{
-				items.POST("/")
-				items.GET("/")
-				items.GET("/:item_id")
-				items.PUT("/:item_id")
-				items.DELETE("/:item_id")
+				items.POST("/", h.createItem)
+				items.GET("/", h.getAllItem)
+				items.GET("/:item_id", h.getItemByID)
+				items.PUT("/:item_id", h.updateItem)
+				items.DELETE("/:item_id", h.deleteItem)
 			}
 		}
 	}

@@ -12,12 +12,13 @@ type Server struct {
 }
 
 //Run method start server
-func (s *Server) Run(port string) error {
+func (s *Server) Run(port string, handler http.Handler) error {
 	s.httpServer = &http.Server{
-		Addr: ":" + port,
+		Addr:           ":" + port,
+		Handler:        handler,
 		MaxHeaderBytes: 1 << 20, //1 mb,
-		ReadTimeout: 10 *time.Second,
-		WriteTimeout: 10 *time.Second,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
 	}
 
 	return s.httpServer.ListenAndServe() //start server in endless cycle for
@@ -26,4 +27,4 @@ func (s *Server) Run(port string) error {
 //ShutDown shutdown server
 func (s *Server) ShutDown(ctx context.Context) error {
 	return s.httpServer.Shutdown(ctx)
-} 
+}
