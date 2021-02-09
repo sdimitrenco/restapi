@@ -4,8 +4,8 @@ import (
 	"github.com/StanislavDimitrenco/restapi/pkg/handler"
 	"github.com/StanislavDimitrenco/restapi/pkg/repository"
 	"github.com/StanislavDimitrenco/restapi/pkg/service"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"log"
 	"os"
 
 	"github.com/StanislavDimitrenco/restapi"
@@ -13,13 +13,14 @@ import (
 )
 
 func main() {
+	logrus.SetFormatter(new(logrus.JSONFormatter))
 
 	if err := initConfig(); err != nil {
-		log.Fatalf("Can't read config file - %s", err.Error())
+		logrus.Fatalf("Can't read config file - %s", err.Error())
 	}
 
 	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Can't load env config: %s", err.Error())
+		logrus.Fatalf("Can't load env config: %s", err.Error())
 	}
 
 	db, err := repository.NewPostgresDB(repository.Config{
@@ -32,7 +33,7 @@ func main() {
 	})
 
 	if err != nil {
-		log.Fatalf("filed to initiate db: %s", err.Error())
+		logrus.Fatalf("filed to initiate db: %s", err.Error())
 	}
 
 	repositories := repository.NewRepository(db)
@@ -42,7 +43,7 @@ func main() {
 	server := new(todo.Server)
 
 	if err := server.Run(viper.GetString("port"), handlers.InitRouts()); err != nil {
-		log.Fatal("error")
+		logrus.Fatal("error")
 	}
 }
 
